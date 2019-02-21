@@ -2,6 +2,8 @@ import numpy as np
 '''
 Implemented so far
 1. Linaar Regression
+2. MultiLinear Regression ( using Gradient Descent )
+3. K Nearest Neighbour
 '''
 class LinearRegression:
 	#1 dimensional y=mx+c
@@ -81,6 +83,69 @@ class MultiLinearRegression:
 
 	def predict(self,x):
 		return self.bias.T*x
+
+
+class KNN:
+
+	def __init__(self):
+		pass
+
+	def euclidDistance(self,d1,d2,len):
+		dist=0
+		for x in range(len):
+			dist+= np.square(d1[x]-d2[x])
+		return np.sqrt(dist)
+
+	def fit(self,x,y):
+		self.x=x
+		self.y=y
+		self.classes=list(set(y))
+
+	def predict(self,xtest,k=1):
+		y=[]
+		for i in xtest:
+			y.append(self.predictS(i,k))
+		return np.array(y)
+
+
+	def predictS(self,xtest,k=1):
+		dist=[]
+		for i in range(len(self.x)):
+			tdist=self.euclidDistance(self.x[i],xtest,self.x.shape[1])
+			dist.append((self.y[i],tdist))
+		dist=sorted(dist,key=lambda x:x[1])
+
+		topK=dist[0:k]
+		classCount={}
+		for classes in self.classes:
+			classCount[classes]=0
+
+		for i in topK:
+			classCount[i[0]]+=1
+
+
+		mx=classCount[self.classes[0]]
+		label=self.classes[0]
+		for i in self.classes:
+			if mx < classCount[i]:
+				mx=classCount[i]
+				label=i
+
+		return label
+
+
+class LogisticRegression:
+	# takes input (x,y) where y is binary information(0,1)
+	def __init__(self):
+		pass
+
+	def sigmoid(self,z):
+		return 1.0/(1+np.exp(-z))
+
+	def predict(self,ytest):
+		z=np.dot(ytest,self.bias)
+		return self.sigmoid(z)
+	
 
 
 
