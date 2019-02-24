@@ -4,6 +4,7 @@ Implemented so far
 1. Linaar Regression
 2. MultiLinear Regression ( using Gradient Descent )
 3. K Nearest Neighbour
+4. NaiveBayesClassifer
 '''
 class LinearRegression:
 	#1 dimensional y=mx+c
@@ -132,6 +133,88 @@ class KNN:
 				label=i
 
 		return label
+
+class NaiveBayesClassifer:
+
+	def __init__(self):
+		pass
+
+	def fit(self,x,y):
+		self.x=x
+		self.y=y
+		self.classes=list(set(y))
+		self.no_features = x.shape[1]
+
+		featureTable=[]
+		self.xT = x.T
+		
+		g={}
+		for i in range(self.no_features):
+			table=[]
+			tempArray={}
+			plSet=list(set(self.xT[i]))
+
+			for ele in plSet:
+				classes=[0 for _ in range(len(self.classes))]
+				for j in range(len(self.y)):
+					classes[self.classes.index(self.y[j])]+= (1 if self.x[j][i] == ele   else 0 ) 
+				tempArray[ele]=classes
+			totalVals=[0 for _ in range(len(self.classes))]
+			for j in tempArray:
+				totalVals=[totalVals[k]+tempArray[j][k] for k in range(len(totalVals))]
+			fs=[]
+			for ele in tempArray:
+				table.append([ tempArray[ele][k]/totalVals[k] for k in range(len(tempArray[ele])) ])
+
+			featureTable.append(table)
+			g[i]=tempArray
+
+		self.featureTable=featureTable
+		self.findX=g
+
+	def predictS(self,xtest):
+		
+		classProb=[]
+		for clas in range(len(self.classes)):
+			res=1
+			for feature in range(self.no_features):
+				x = xtest[feature]
+				xindex = self.findX[feature]
+				xindex = list(xindex.keys()).index(x)
+				res*=self.featureTable[feature][xindex][clas]
+			classProb.append(res)
+		t=[x/sum(classProb) for x in classProb]
+
+		return self.classes[t.index(max(t))]
+
+
+	def predict(self,xtest):
+		try:
+			y=[]
+			for i in xtest:
+				y.append(self.predictS(i))
+			return y
+		except:
+			raise Exception("Argument not found.")
+
+
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 class LogisticRegression:
